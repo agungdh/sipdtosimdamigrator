@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -22,13 +23,14 @@ public class SipdService {
     public void updateSubUnitValue()
     {
         ArrayList<SipdUnit> units = this.getSipdOptionsBasedOnUnit();
-
         ArrayList<SipdSubUnit> sipdSubUnits;
+        String[] explodedKodeUnit;
+        String QUERY;
 
         for (int i = 0; i < units.size(); i++) {
             sipdSubUnits = new ArrayList<SipdSubUnit>();
 
-            String QUERY = "SELECT du.id as id_data_unit, wo.option_value as kode_skpd, du.nama_skpd, wo_unit.option_value as kode_unit, du_unit.nama_skpd as nama_unit\n" +
+            QUERY = "SELECT du.id as id_data_unit, wo.option_value as kode_skpd, du.nama_skpd, wo_unit.option_value as kode_unit, du_unit.nama_skpd as nama_unit, wo.option_id as id_option, du.id_skpd\n" +
                     "from wp_options as wo\n" +
                     "join data_unit as du\n" +
                     "on substring(wo.option_name, 11) = du.id_skpd\n" +
@@ -56,6 +58,8 @@ public class SipdService {
                     sipdSubUnits.add(
                             new SipdSubUnit(
                                 rs.getInt("id_data_unit"),
+                                rs.getInt("id_option"),
+                                rs.getInt("id_skpd"),
                                 rs.getString("kode_skpd"),
                                 rs.getString("nama_skpd"),
                                 rs.getString("kode_unit"),
@@ -63,8 +67,26 @@ public class SipdService {
                             )
                     );
 
-                    log.info(String.valueOf(sipdSubUnits.size() - 1));
-                    log.info(sipdSubUnits.get(sipdSubUnits.size() - 1).toString());
+                    explodedKodeUnit = sipdSubUnits.get(sipdSubUnits.size() - 1).getKodeUnit().split("\\.");
+                    explodedKodeUnit[3] = String.valueOf(sipdSubUnits.size() + 1);
+                    log.info("ID: " + String.valueOf(sipdSubUnits.size() + 1));
+                    log.info("Data: " + sipdSubUnits.get(sipdSubUnits.size() - 1).toString());
+                    log.info("Become: " + String.join(".", explodedKodeUnit));
+
+                    String QUERY2 = "UPDATE wp_options\n" +
+                            "SET option_value = '" + String.join(".", explodedKodeUnit) + "'\n" +
+                            "WHERE option_name = '_crb_unit_" + sipdSubUnits.get(sipdSubUnits.size() - 1).getIdSkpd() + "'";
+                    log.info(QUERY2);
+                    try(
+                            Statement stmt2 = conn.createStatement();
+                            ResultSet rs2 = stmt2.executeQuery(QUERY2);
+                    ) {
+                        log.info("Done");
+                    } catch (SQLException e) {
+                        log.error("SQLException Error: " + e.getMessage());
+
+                        e.printStackTrace();
+                    }
                 }
             } catch (SQLException e) {
                 log.error("SQLException Error: " + e.getMessage());

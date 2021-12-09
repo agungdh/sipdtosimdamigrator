@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 @Data @NoArgsConstructor @AllArgsConstructor
 public class SipdSubUnit {
     private int idDataUnit;
+    private long idOption;
+    private int idSkpd;
     private String kodeSkpd;
     private String namaSkpd;
     private String kodeUnit;
