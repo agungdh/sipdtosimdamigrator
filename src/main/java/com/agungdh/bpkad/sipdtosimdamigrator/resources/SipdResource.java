@@ -29,4 +29,9 @@ public class SipdResource {
 
         return ResponseEntity.ok().body(listopdunitonlys);
     }
+
+    @GetMapping("/updateSubUnitValue")
+    public void updateSubUnitValue() {
+        sipdService.updateSubUnitValue();
+    }
 }

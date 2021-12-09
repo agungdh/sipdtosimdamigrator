@@ -5,9 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data @NoArgsConstructor @AllArgsConstructor
-public class SipdUnit {
-    private int id;
+public class SipdSubUnit {
+    private int idDataUnit;
+    private String kodeSkpd;
     private String namaSkpd;
-    private String optionValue;
-    private int isSkpd;
+    private String kodeUnit;
+    private String namaUnit;
 }
