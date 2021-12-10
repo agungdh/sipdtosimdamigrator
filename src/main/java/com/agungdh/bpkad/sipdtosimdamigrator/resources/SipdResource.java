@@ -34,4 +34,9 @@ public class SipdResource {
     public void updateSubUnitValue() {
         sipdService.updateSubUnitValue();
     }
+
+    @GetMapping("/injectsimdaskpd")
+    public void injectsimdaskpd() {
+        sipdService.simdaInjectRefUnitSkpd();
+    }
 }

@@ -101,7 +101,7 @@ public class SipdService {
 
         ArrayList<SipdUnit> sipdUnits = new ArrayList<SipdUnit>();
 
-        String QUERY = "SELECT wo.option_value, du.nama_skpd, du.is_skpd, du.id\n" +
+        String QUERY = "SELECT wo.option_value, du.nama_skpd, du.is_skpd, du.id, du.kode_skpd\n" +
                 "from wp_options as wo\n" +
                 "join data_unit as du\n" +
                 "on substring(wo.option_name, 11) = du.id_skpd\n" +
@@ -119,7 +119,7 @@ public class SipdService {
         ) {
 
             while (rs.next()) {
-                sipdUnits.add(new SipdUnit(rs.getInt("id"), rs.getString("nama_skpd"), rs.getString("option_value"), rs.getInt("is_skpd")));
+                sipdUnits.add(new SipdUnit(rs.getInt("id"), rs.getString("nama_skpd"), rs.getString("option_value"), rs.getInt("is_skpd"), rs.getString("kode_skpd")));
             }
 
         } catch (SQLException e) {
@@ -153,7 +153,7 @@ public class SipdService {
             ) {
 
             while (rs.next()) {
-                sipdUnits.add(new SipdUnit(rs.getInt("id"), rs.getString("nama_skpd"), rs.getString("option_value"), rs.getInt("is_skpd")));
+                sipdUnits.add(new SipdUnit(rs.getInt("id"), rs.getString("nama_skpd"), rs.getString("option_value"), rs.getInt("is_skpd"), rs.getString("kode_skpd")));
             }
 
         } catch (SQLException e) {
@@ -163,5 +163,39 @@ public class SipdService {
         }
 
         return sipdUnits;
+    }
+
+    public void simdaInjectRefUnitSkpd()
+    {
+        ArrayList<SipdUnit> units = this.getSipdOptionsBasedOnUnit();
+
+        for (int i = 0; i < units.size(); i++) {
+            log.info(units.get(i).getOptionValue());
+            String[] explodedKodeUnit = units.get(i).getOptionValue().split("\\.");
+            explodedKodeUnit = Arrays.copyOf(explodedKodeUnit, 3);
+            String kodeOpd = String.join(".", explodedKodeUnit);
+            log.info(kodeOpd);
+            String[] explodedKodeUnit90 = units.get(i).getKodeSkpd90().split("\\.");
+            String kodeUnit90 = explodedKodeUnit90[0] + '-' + explodedKodeUnit90[1] + '.' + explodedKodeUnit90[2] + '-' + explodedKodeUnit90[3] + '.' + explodedKodeUnit90[4] + '-' + explodedKodeUnit90[5] + '.' + explodedKodeUnit90[6];
+            log.info(kodeUnit90);
+
+            String QUERY = "insert into ref_unit values (" + explodedKodeUnit[0] + "," + explodedKodeUnit[1] + "," + explodedKodeUnit[2] + ", '" + units.get(i).getNamaSkpd() + "', '" + kodeUnit90 + "')";
+//
+            try(
+                    Connection conn = DriverManager.getConnection(
+                            env.getProperty("agungdh.jdbc.sqlserver.url"),
+                            env.getProperty("agungdh.jdbc.sqlserver.user"),
+                            env.getProperty("agungdh.jdbc.sqlserver.password")
+                    );
+                    Statement stmt = conn.createStatement();
+                    ResultSet rs = stmt.executeQuery(QUERY);
+            ) {
+
+            } catch (SQLException e) {
+                log.error("SQLException Error: " + e.getMessage());
+
+                e.printStackTrace();
+            }
+        }
     }
 }

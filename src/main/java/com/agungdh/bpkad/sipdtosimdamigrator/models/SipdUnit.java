@@ -10,4 +10,5 @@ public class SipdUnit {
     private String namaSkpd;
     private String optionValue;
     private int isSkpd;
+    private String kodeSkpd90;
 }
