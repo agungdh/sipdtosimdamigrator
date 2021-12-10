@@ -39,4 +39,9 @@ public class SipdResource {
     public void injectsimdaskpd() {
         sipdService.simdaInjectRefUnitSkpd();
     }
+
+    @GetMapping("/injectSkpd")
+    public void injectSkpd() {
+        sipdService.injectSkpd();
+    }
 }

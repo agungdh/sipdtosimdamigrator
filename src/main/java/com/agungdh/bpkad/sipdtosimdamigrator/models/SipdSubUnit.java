@@ -13,4 +13,6 @@ public class SipdSubUnit {
     private String namaSkpd;
     private String kodeUnit;
     private String namaUnit;
+    private String namaKepala;
+    private String nipKepala;
 }
